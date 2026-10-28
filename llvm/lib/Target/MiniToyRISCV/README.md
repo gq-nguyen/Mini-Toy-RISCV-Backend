@@ -1,4 +1,4 @@
-# In process implement RISC-V Instruction
+# Instruction Support Goals
 
 | LLVM IR | RISC-V Instruction |
 |---|---|	
