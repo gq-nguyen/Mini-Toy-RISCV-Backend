@@ -1,0 +1,6 @@
+#ifndef LLVM_LIB_TARGET_MINITOYRISCVREGISTERINFO_H
+#define LLVM_LIB_TARGET_MINITOYRISCVREGISTERINFO_H
+
+#include "llvm/CodeGen/TargetRegisterInfo.h"
+
+#endif

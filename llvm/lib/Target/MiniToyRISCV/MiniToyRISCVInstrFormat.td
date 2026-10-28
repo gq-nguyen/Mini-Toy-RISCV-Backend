@@ -1,6 +1,6 @@
 // used to emit instruction encoding by code emitter 
 class InstrFormat<bits<2> val> {
-	bits<2> Value = val;
+  bits<2> Value = val;
 }
 
 def InstFormatR : InstrFormat<0>;
@@ -8,20 +8,21 @@ def InstFormatI : InstrFormat<1>;
 def InstFormatS : InstrFormat<2>;
 def InstFormatB : InstrFormat<3>;
 
+include "Target.td"
 // Generic instruction format
 class MiniToyRISCVInstruction <dag outs, dag ins, string asmstr, list<dag> pattern, 
-					InstrItinClass itin, Format f> : Instruction {
-	bits<32> Inst;
-	let Namespace = "MiniToyRISCV";
-	let Size = 4;
-	bits<7> opcode;
-	let Inst{0-7} = opcode;
+          InstrItinClass itin, InstrFormat f> : Instruction {
+  bits<32> Inst;
+  let Namespace = "MiniToyRISCV";
+  let Size = 4;
+  bits<7> opcode;
+  let Inst{6-0} = opcode;
 
-	let OutOperandList = outs;
-	let InOperandList = ins;
-	let AsmString = asmstr;
-	let Pattern = pattern;
-	let Itinerary = itin; // Execution steps used for scheduling.
+  let OutOperandList = outs;
+  let InOperandList = ins;
+  let AsmString = asmstr;
+  let Pattern = pattern;
+  let Itinerary = itin; // Execution steps used for scheduling.
 }
 
 //  31      30 29 28 27 26 25 24 23 22 21     20 19 18 17 16 15 14 13 12 11 10 9 8       7 6 5 4 3 2 1 0
@@ -29,17 +30,17 @@ class MiniToyRISCVInstruction <dag outs, dag ins, string asmstr, list<dag> patte
 // │         funct7          │       rs2        │     rs1      │ funct3 │       rd        │   opcode    │ R-type
 // ├─────────────────────────┴──────────────────┼──────────────┼────────┼─────────────────┼─────────────┤
 
-class FR <bits<7> opcode, bits<3> funct3, bits<7> funct7;, dag outs, dag ins, string asmstr, list<dag> pattern, InstrItinClass itin> :
-		MiniToyRISCVInstruction <outs, ins, asmstr, pattern, itin, FormatR> {
-	bits<5> rd;
-	bits<5> rs1;
-	bits<5> rs2;
+class FR <bits<7> opcode, bits<3> funct3, bits<7> funct7, dag outs, dag ins, string asmstr, list<dag> pattern, InstrItinClass itin> :
+    MiniToyRISCVInstruction <outs, ins, asmstr, pattern, itin, InstFormatR> {
+  bits<5> rd;
+  bits<5> rs1;
+  bits<5> rs2;
 
-	let Inst{7-11} = rd;
-	let Inst{12-14} = funct3;
-	let Inst{15-19} = rs1;
-	let Inst{20-24} = rs2;
-	let Inst{25-31} = funct7;
+  let Inst{7-11} = rd;
+  let Inst{12-14} = funct3;
+  let Inst{15-19} = rs1;
+  let Inst{20-24} = rs2;
+  let Inst{25-31} = funct7;
 }
 
 //  31      30 29 28 27 26 25 24 23 22 21   20   19 18 17 16 15 14 13 12 11 10 9 8     7   6 5 4 3 2 1 0
@@ -48,7 +49,7 @@ class FR <bits<7> opcode, bits<3> funct3, bits<7> funct7;, dag outs, dag ins, st
 // ├─────────────────────────┬──────────────────┼──────────────┼────────┼─────────────────┼─────────────┤
 class FI <
   bits<7> opcode, bits<3> funct3, dag outs, dag ins, string asmstr, list<dag> pattern, InstrItinClass itin
->: MiniToyRISCVInstruction <outs, ins, asmstr, pattern, itin, FormatR> {
+>: MiniToyRISCVInstruction <outs, ins, asmstr, pattern, itin, InstFormatI> {
   bits<5> rd;
   bits<5> rs1;
   bits<12> imm;
@@ -66,7 +67,7 @@ class FI <
 // ├───────┬─────────────────┼──────────────────┼──────────────┼────────┼─────────┬───────┼─────────────┤
 class FS <
   bits<7> opcode, bits<3> funct3, dag outs, dag ins, string asmstr, list<dag> pattern, InstrItinClass itin
->: MiniToyRISCVInstruction <outs, ins, asmstr, pattern, itin, FormatR> {
+>: MiniToyRISCVInstruction <outs, ins, asmstr, pattern, itin, InstFormatS> {
   bits<5> rs1;
   bits<5> rs2;
   bits<12> imm;
@@ -85,7 +86,7 @@ class FS <
 // ├───────┴─────────────────┴──────────────────┴──────────────┴────────┼─────────┴───────┼─────────────┤
 class FB <
   bits<7> opcode, bits<3> funct3, dag outs, dag ins, string asmstr, list<dag> pattern, InstrItinClass itin
->: MiniToyRISCVInstruction <outs, ins, asmstr, pattern, itin, FormatR> {
+>: MiniToyRISCVInstruction <outs, ins, asmstr, pattern, itin, InstFormatB> {
   bits<5> rs1;
   bits<5> rs2;
   bits<12> imm;

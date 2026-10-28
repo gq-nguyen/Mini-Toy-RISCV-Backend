@@ -1,24 +1,12 @@
 // The TargetRegisterInfo class is used to describe the register file of the target and any interactions between the registers.
 
-/* Defined in Target.td
-class Register<string n> {
-  string Namespace = "";
-  string AsmName = n;
-  string Name = n;
-  int SpillSize = 0;
-  int SpillAlignment = 0;
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<int> DwarfNumbers = [];
-}
-*/
-
+include "Target.td"
 class MiniToyRISCVRegister<bits<5> Enc, string n> : Register <n> {
   let Namespace = "MiniToyRISCV"; // overrides the default namespace of class Register
-  let HWEncoding = enc;
+  let HWEncoding{4-0} = Enc;
 }
 
-class MiniToyRISCVGPRegister<bit<5> Enc, string n> : MiniToyRISCVRegister <enc, n>;
+class MiniToyRISCVGPRegister<bits<5> Enc, string n> : MiniToyRISCVRegister <Enc, n>;
 
 let Namespace = "MiniToyRISCV" in {
   def ZERO : MiniToyRISCVGPRegister<0,  "x0">,   DwarfRegNum<[0]>;
@@ -55,32 +43,9 @@ let Namespace = "MiniToyRISCV" in {
   def T6   : MiniToyRISCVGPRegister<31, "x31">,  DwarfRegNum<[31]>;
 }
 
-/* 
-class RegisterClass<string namespace,
-list<ValueType> regTypes, int alignment, dag regList> {
-  string Namespace = namespace;
-  list<ValueType> RegTypes = regTypes;
-  int Size = 0;  // spill size, in bits; zero lets tblgen pick the size
-  int Alignment = alignment;
-
-  // CopyCost is the cost of copying a value between two registers
-  // default value 1 means a single instruction
-  // A negative value means copying is extremely expensive or impossible
-  int CopyCost = 1;
-  dag MemberList = regList;
-
-  // for register classes that are subregisters of this class
-  list<RegisterClass> SubRegClassList = [];
-
-  code MethodProtos = [{}];  // to insert arbitrary code
-  code MethodBodies = [{}];
-}
-*/
-
-
 def IntRegs : RegisterClass<"MiniToyRISCV", [i32], 32,
     (add A0, A1, A2, A3, A4, A5, A6, A7,  // arguments/return values
-         T0, T1, T2, T3, T4, T5, T6       // Temporaries
+         T0, T1, T2, T3, T4, T5, T6,      // Temporaries
          ZERO,
          FP, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, // Other
          RA, SP, GP, TP
